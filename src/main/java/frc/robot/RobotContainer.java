@@ -8,6 +8,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -30,6 +33,8 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
       new CommandXboxController(0);
+
+  private final DoubleSupplier leftYAxis = () -> m_driverController.getRawAxis(1);
 
 
 
@@ -68,7 +73,7 @@ public class RobotContainer {
        
        // m_driverController.b().onTrue(m_exampleSubsystem.LEDColors());
        // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.servoTurn());
-        m_exampleSubsystem.setDefaultCommand(Commands.runOnce(() -> m_exampleSubsystem.motorTurn(m_driverController.getRightY()), m_exampleSubsystem));
+        m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.motorTurn(leftYAxis));
         
         
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,

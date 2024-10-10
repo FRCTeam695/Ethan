@@ -166,8 +166,8 @@ public class ExampleSubsystem extends SubsystemBase {
 //     return (true);
 //   }
 
-public void motorTurn(double num){
-  motor.set(num);
+public Command motorTurn(DoubleSupplier num) {
+  return new FunctionalCommand(() -> {}, () -> {motor.set(num.getAsDouble());}, interruted -> {},  () -> false, this);
 }
 
 
