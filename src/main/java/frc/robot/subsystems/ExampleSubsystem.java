@@ -24,17 +24,25 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Servo;
 
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController;
 
+import edu.wpi.first.wpilibj.MotorSafety;
 
 
+
+
+    
+   
+   
 
 
 public class ExampleSubsystem extends SubsystemBase {
@@ -64,9 +72,31 @@ public class ExampleSubsystem extends SubsystemBase {
   NetworkTable table;
 
   CANSparkFlex motor;
+  MotorSafety watchdog;
+
+   
+ //private DifferentialDrive m_robotDrive;
+private final CANSparkMax leftMotorLeader;
+private final CANSparkMax rightMotorLeader;
+private final CANSparkMax leftMotorFollower;
+private final CANSparkMax rightMotorFollower;
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem()
   {
+    leftMotorLeader = new CANSparkMax(10, MotorType.kBrushless);
+    rightMotorLeader = new CANSparkMax(11,MotorType.kBrushless);
+    leftMotorFollower = new CANSparkMax(12, MotorType.kBrushless);
+    rightMotorFollower = new CANSparkMax(13, MotorType.kBrushless);
+    //m_robotDrive = new DifferentialDrive(leftMotorLeader, rightMotorLeader);
+
+    leftMotorFollower.follow(leftMotorLeader);
+    rightMotorFollower.follow(rightMotorLeader);
+  
+    
+
+    rightMotorLeader.setInverted(true);
+
+    
 
     controller = new XboxController(0);
 
@@ -108,7 +138,40 @@ public class ExampleSubsystem extends SubsystemBase {
    */
   
 
+public Command TankDrive(double Right, double Left){
+  return new FunctionalCommand(
 
+
+  // ** INIT
+  ()-> {},
+ 
+  // ** EXECUTE
+  ()-> {
+
+    if(controller.getRightY()!= 0){
+      rightMotorLeader.set(Right);
+      
+    }
+    if(controller.getLeftY()!= 0){
+      leftMotorLeader.set(Left);
+      
+    }
+
+
+
+  },
+ 
+  // ** ON INTERRUPTED
+  interrupted -> {},
+ 
+  // ** END CONDITION
+  ()-> false,
+
+
+  // ** REQUIREMENTS
+  this);
+
+  }
 
 
 
@@ -167,7 +230,7 @@ public class ExampleSubsystem extends SubsystemBase {
 //   }
 
 public Command motorTurn(DoubleSupplier num) {
-  return new FunctionalCommand(() -> {}, () -> {motor.set(num.getAsDouble());}, interruted -> {},  () -> false, this);
+  return new FunctionalCommand(() -> {}, () -> {motor.set(num.getAsDouble());}, interrupted -> {},  () -> false, this);
 }
 
 

@@ -6,11 +6,11 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -31,11 +31,17 @@ public class RobotContainer {
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(0);
+ // private final CommandXboxController m_driverController =
+      //new CommandXboxController(0);
+  private final Joystick m_driverController =
+      new Joystick(0);
+  private final Joystick m_leftJoystick =
+      new Joystick(1);
+  
+
 
   private final DoubleSupplier leftYAxis = () -> m_driverController.getRawAxis(1);
-
+  
 
 
 
@@ -45,8 +51,8 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    Trigger bButton = m_driverController.b();
-    
+  //  Trigger bButton = m_driverController.b();
+    //BUTTON^^^
 
 
 
@@ -67,15 +73,14 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    new Trigger(m_exampleSubsystem::exampleCondition);
+        
 
        
        // m_driverController.b().onTrue(m_exampleSubsystem.LEDColors());
        // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.servoTurn());
         m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.motorTurn(leftYAxis));
-        
-        
+        m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.TankDrive(m_driverController.getRawAxis(1),m_leftJoystick.getRawAxis(1)));
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
 
