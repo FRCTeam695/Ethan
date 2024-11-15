@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.wpilibj.XboxController;
+
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,12 +32,13 @@ import edu.wpi.first.wpilibj.Servo;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.wpilibj.MotorSafety;
 
-
+import com.revrobotics.SparkPIDController;
 
 
     
@@ -66,7 +67,7 @@ public class ExampleSubsystem extends SubsystemBase {
   BooleanPublisher X_Button;
   BooleanPublisher A_Button;
   DoublePublisher stickY;
-  XboxController controller;
+ 
 
   NetworkTableInstance inst;
   NetworkTable table;
@@ -80,6 +81,12 @@ private final CANSparkMax leftMotorLeader;
 private final CANSparkMax rightMotorLeader;
 private final CANSparkMax leftMotorFollower;
 private final CANSparkMax rightMotorFollower;
+
+private CANSparkFlex myMotor;
+private RelativeEncoder myEncoder;
+private SparkPIDController myPID;
+
+
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem()
   {
@@ -98,7 +105,7 @@ private final CANSparkMax rightMotorFollower;
 
     
 
-    controller = new XboxController(0);
+    
 
     inst = NetworkTableInstance.getDefault();
     table = inst.getTable("frc695_test_table");
@@ -127,7 +134,16 @@ private final CANSparkMax rightMotorFollower;
 
     stickY = table.getDoubleTopic("stick y axis").publish();
 
-    motor = new CANSparkFlex(49, MotorType.kBrushless);
+    myMotor = new CANSparkFlex(49, MotorType.kBrushless);
+    myEncoder = myMotor.getEncoder();
+    myMotor.restoreFactoryDefaults();
+    myPID = myMotor.getPIDController();
+      myPID.setP(90);
+      myPID.setD(0);
+      myPID.setOutputRange(ServoVal, x);
+      myPID.setFF(1);
+
+   // motor = new CANSparkFlex(49, MotorType.kBrushless);
   }
 
 
@@ -137,8 +153,11 @@ private final CANSparkMax rightMotorFollower;
    * @return a command
    */
   
+  //  public void PID (){
+  //     myPID.setReference(500,CANSparkFlex.ControlType.kVelocity);
+  //  }
 
-public Command TankDrive(double Right, double Left){
+public Command PID(){
   return new FunctionalCommand(
 
 
@@ -148,14 +167,39 @@ public Command TankDrive(double Right, double Left){
   // ** EXECUTE
   ()-> {
 
-    if(controller.getRightY()!= 0){
-      rightMotorLeader.set(Right);
+myPID.setReference(500,CANSparkFlex.ControlType.kVelocity);
+
+
+  },
+ 
+  // ** ON INTERRUPTED
+  interrupted -> {},
+ 
+  // ** END CONDITION
+  ()-> false,
+
+
+  // ** REQUIREMENTS
+  this);
+
+  }
+
+
+
+public Command TankDrive(DoubleSupplier Right, DoubleSupplier Left){
+  return new FunctionalCommand(
+
+
+  // ** INIT
+  ()-> {},
+ 
+  // ** EXECUTE
+  ()-> {
+
+    
+      rightMotorLeader.set(Right.getAsDouble());
       
-    }
-    if(controller.getLeftY()!= 0){
-      leftMotorLeader.set(Left);
-      
-    }
+      leftMotorLeader.set(Left.getAsDouble());
 
 
 
@@ -234,102 +278,101 @@ public Command motorTurn(DoubleSupplier num) {
 }
 
 
+//LED's and Servo
+//   public Command servoTurn() {
+//     return new FunctionalCommand(
 
-  public Command servoTurn() {
-    //DoubleSupplier RightY) {
-    return new FunctionalCommand(
+//       // INIT
+//       ()-> {},
 
-      // INIT
-      ()-> {},
+//       // EXECUTE
+//       () -> { 
+//         if (controller.getRightY() != 0) {
+//           servo.set((controller.getRightY()+1)/2);
+//           if(controller.getRightY()>0){
+//             int LEDSpeedParameterG = 0;
+//             if((controller.getRightY()+1)/2 <0.2 && (controller.getRightY()+1)/2 >0 ){
+//               LEDSpeedParameterG = 1;
+//             }
+//             if((controller.getRightY()+1)/2 <0.4 && (controller.getRightY()+1)/2 >0.2 ){
+//               LEDSpeedParameterG = 2;
+//             }
+//             if((controller.getRightY()+1)/2 <0.6 && (controller.getRightY()+1)/2 >0.4 ){
+//               LEDSpeedParameterG = 3;
+//             }
+//             if((controller.getRightY()+1)/2 <0.8 && (controller.getRightY()+1)/2 >0.6 ){
+//               LEDSpeedParameterG = 4;
+//             }
+//             if((controller.getRightY()+1)/2 <=1 && (controller.getRightY()+1)/2 >0.8 ){
+//               LEDSpeedParameterG = 5;
+//             }
+//             AddressableLEDBuffer greenLEDBuffer = new AddressableLEDBuffer(5);
+//             for(var i= 0; i< LEDSpeedParameterG; i++){
+//                   greenLEDBuffer.setRGB(i,0, 255, 0);
+//                }
+//                myLED.setData(greenLEDBuffer);
+//                myLED.start();
+//           }
+//           if(controller.getRightY()<0){
+//             //Set speed parameter for LED with multitude of variables T^T
+//             int LEDSpeedParameter = 0;
+//             if((controller.getRightY()+1)/2 <0.2 && (controller.getRightY()+1)/2 >=0 ){
+//               LEDSpeedParameter = 5;
+//             }
+//             if((controller.getRightY()+1)/2 <0.4 && (controller.getRightY()+1)/2 >0.2 ){
+//               LEDSpeedParameter = 4;
+//             }
+//             if((controller.getRightY()+1)/2 <0.6 && (controller.getRightY()+1)/2 >0.4 ){
+//               LEDSpeedParameter = 3;
+//             }
+//             if((controller.getRightY()+1)/2 <0.8 && (controller.getRightY()+1)/2 >0.6 ){
+//               LEDSpeedParameter = 2;
+//             }
+//             if((controller.getRightY()+1)/2 <=1 && (controller.getRightY()+1)/2 >0.8 ){
+//               LEDSpeedParameter = 1;
+//             }
 
-      // EXECUTE
-      () -> { 
-        if (controller.getRightY() != 0) {
-          servo.set((controller.getRightY()+1)/2);
-          if(controller.getRightY()>0){
-            int LEDSpeedParameterG = 0;
-            if((controller.getRightY()+1)/2 <0.2 && (controller.getRightY()+1)/2 >0 ){
-              LEDSpeedParameterG = 1;
-            }
-            if((controller.getRightY()+1)/2 <0.4 && (controller.getRightY()+1)/2 >0.2 ){
-              LEDSpeedParameterG = 2;
-            }
-            if((controller.getRightY()+1)/2 <0.6 && (controller.getRightY()+1)/2 >0.4 ){
-              LEDSpeedParameterG = 3;
-            }
-            if((controller.getRightY()+1)/2 <0.8 && (controller.getRightY()+1)/2 >0.6 ){
-              LEDSpeedParameterG = 4;
-            }
-            if((controller.getRightY()+1)/2 <=1 && (controller.getRightY()+1)/2 >0.8 ){
-              LEDSpeedParameterG = 5;
-            }
-            AddressableLEDBuffer greenLEDBuffer = new AddressableLEDBuffer(5);
-            for(var i= 0; i< LEDSpeedParameterG; i++){
-                  greenLEDBuffer.setRGB(i,0, 255, 0);
-               }
-               myLED.setData(greenLEDBuffer);
-               myLED.start();
-          }
-          if(controller.getRightY()<0){
-            //Set speed parameter for LED with multitude of variables T^T
-            int LEDSpeedParameter = 0;
-            if((controller.getRightY()+1)/2 <0.2 && (controller.getRightY()+1)/2 >=0 ){
-              LEDSpeedParameter = 5;
-            }
-            if((controller.getRightY()+1)/2 <0.4 && (controller.getRightY()+1)/2 >0.2 ){
-              LEDSpeedParameter = 4;
-            }
-            if((controller.getRightY()+1)/2 <0.6 && (controller.getRightY()+1)/2 >0.4 ){
-              LEDSpeedParameter = 3;
-            }
-            if((controller.getRightY()+1)/2 <0.8 && (controller.getRightY()+1)/2 >0.6 ){
-              LEDSpeedParameter = 2;
-            }
-            if((controller.getRightY()+1)/2 <=1 && (controller.getRightY()+1)/2 >0.8 ){
-              LEDSpeedParameter = 1;
-            }
-
-            AddressableLEDBuffer redLEDBuffer = new AddressableLEDBuffer(5);
-            for(var i=0; i< LEDSpeedParameter; i++){
-              redLEDBuffer.setRGB(i, 255,0,0);
-            }
-            myLED.setData(redLEDBuffer);
-            myLED.start();
-          }
-        } 
+//             AddressableLEDBuffer redLEDBuffer = new AddressableLEDBuffer(5);
+//             for(var i=0; i< LEDSpeedParameter; i++){
+//               redLEDBuffer.setRGB(i, 255,0,0);
+//             }
+//             myLED.setData(redLEDBuffer);
+//             myLED.start();
+//           }
+//         } 
         
-        if (controller.getRightY() == 0) {
-          servo.set(0.475);
-          AddressableLEDBuffer noneLEDBuffer = new AddressableLEDBuffer(5);
-          for(var i=0; i< myLEDBuffer.getLength(); i++){
-              noneLEDBuffer.setRGB(i,0,0,0);
-            }
-            myLED.setData(noneLEDBuffer);
-            myLED.start();
-        }
-      },//ServoExecute(RightY.getAsDouble());},
+//         if (controller.getRightY() == 0) {
+//           servo.set(0.475);
+//           AddressableLEDBuffer noneLEDBuffer = new AddressableLEDBuffer(5);
+//           for(var i=0; i< myLEDBuffer.getLength(); i++){
+//               noneLEDBuffer.setRGB(i,0,0,0);
+//             }
+//             myLED.setData(noneLEDBuffer);
+//             myLED.start();
+//         }
+//       },//ServoExecute(RightY.getAsDouble());},
 
-      // ON INTERRUPTED
-      interrupted -> {},
+//       // ON INTERRUPTED
+//       interrupted -> {},
 
-      // END
-      () -> false,
+//       // END
+//       () -> false,
 
-    this);
+//     this);
 
-  }
+//   }
 
 
   
 
 
-private void interrupt(){
-servo.set(0.475);
-}
+// private void interrupt(){
+// servo.set(0.475);
+// }
 
-private boolean endCondition(){
-  return (false);
-}
+// private boolean endCondition(){
+//   return (false);
+// }
 
 
 

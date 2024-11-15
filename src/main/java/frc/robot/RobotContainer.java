@@ -11,7 +11,9 @@ import frc.robot.subsystems.ExampleSubsystem;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -33,14 +35,15 @@ public class RobotContainer {
   // Replace with CommandPS4Controller or CommandJoystick if needed
  // private final CommandXboxController m_driverController =
       //new CommandXboxController(0);
-  private final Joystick m_driverController =
-      new Joystick(0);
+  private final CommandXboxController m_driverController =
+      new CommandXboxController(1);
   private final Joystick m_leftJoystick =
-      new Joystick(1);
+      new Joystick(0);
   
 
 
-  private final DoubleSupplier leftYAxis = () -> m_driverController.getRawAxis(1);
+  private final DoubleSupplier leftYAxis = () -> m_leftJoystick.getRawAxis(1);
+  private final DoubleSupplier rightYAxis = () -> m_driverController.getRawAxis(1);
   
 
 
@@ -79,8 +82,10 @@ public class RobotContainer {
        
        // m_driverController.b().onTrue(m_exampleSubsystem.LEDColors());
        // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.servoTurn());
-        m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.motorTurn(leftYAxis));
-        m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.TankDrive(m_driverController.getRawAxis(1),m_leftJoystick.getRawAxis(1)));
+       // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.motorTurn(leftYAxis));
+       // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.TankDrive(rightYAxis,leftYAxis));
+        m_driverController.b().onTrue( m_exampleSubsystem.PID());
+       // .onTrue(runOnce(() -> m_exampleSubsystem.PID(), m_exampleSubsystem));
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
 
