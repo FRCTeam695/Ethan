@@ -77,10 +77,10 @@ public class ExampleSubsystem extends SubsystemBase {
 
    
  //private DifferentialDrive m_robotDrive;
-private final CANSparkMax leftMotorLeader;
-private final CANSparkMax rightMotorLeader;
-private final CANSparkMax leftMotorFollower;
-private final CANSparkMax rightMotorFollower;
+// private final CANSparkMax leftMotorLeader;
+// private final CANSparkMax rightMotorLeader;
+// private final CANSparkMax leftMotorFollower;
+// private final CANSparkMax rightMotorFollower;
 
 private CANSparkFlex myMotor;
 private RelativeEncoder myEncoder;
@@ -90,18 +90,18 @@ private SparkPIDController myPID;
   /** Creates a new ExampleSubsystem. */
   public ExampleSubsystem()
   {
-    leftMotorLeader = new CANSparkMax(10, MotorType.kBrushless);
-    rightMotorLeader = new CANSparkMax(11,MotorType.kBrushless);
-    leftMotorFollower = new CANSparkMax(12, MotorType.kBrushless);
-    rightMotorFollower = new CANSparkMax(13, MotorType.kBrushless);
-    //m_robotDrive = new DifferentialDrive(leftMotorLeader, rightMotorLeader);
+    // leftMotorLeader = new CANSparkMax(10, MotorType.kBrushless);
+    // rightMotorLeader = new CANSparkMax(11,MotorType.kBrushless);
+    // leftMotorFollower = new CANSparkMax(12, MotorType.kBrushless);
+    // rightMotorFollower = new CANSparkMax(13, MotorType.kBrushless);
+    // //m_robotDrive = new DifferentialDrive(leftMotorLeader, rightMotorLeader);
 
-    leftMotorFollower.follow(leftMotorLeader);
-    rightMotorFollower.follow(rightMotorLeader);
+    // leftMotorFollower.follow(leftMotorLeader);
+    // rightMotorFollower.follow(rightMotorLeader);
   
     
 
-    rightMotorLeader.setInverted(true);
+    // rightMotorLeader.setInverted(true);
 
     
 
@@ -134,14 +134,7 @@ private SparkPIDController myPID;
 
     stickY = table.getDoubleTopic("stick y axis").publish();
 
-    myMotor = new CANSparkFlex(49, MotorType.kBrushless);
-    myEncoder = myMotor.getEncoder();
-    myMotor.restoreFactoryDefaults();
-    myPID = myMotor.getPIDController();
-      myPID.setP(90);
-      myPID.setD(0);
-      myPID.setOutputRange(ServoVal, x);
-      myPID.setFF(1);
+   
 
    // motor = new CANSparkFlex(49, MotorType.kBrushless);
   }
@@ -157,65 +150,39 @@ private SparkPIDController myPID;
   //     myPID.setReference(500,CANSparkFlex.ControlType.kVelocity);
   //  }
 
-public Command PID(){
-  return new FunctionalCommand(
 
 
-  // ** INIT
-  ()-> {},
+
+// public Command TankDrive(DoubleSupplier Right, DoubleSupplier Left){
+//   return new FunctionalCommand(
+
+
+//   // ** INIT
+//   ()-> {},
  
-  // ** EXECUTE
-  ()-> {
-
-myPID.setReference(500,CANSparkFlex.ControlType.kVelocity);
-
-
-  },
- 
-  // ** ON INTERRUPTED
-  interrupted -> {},
- 
-  // ** END CONDITION
-  ()-> false,
-
-
-  // ** REQUIREMENTS
-  this);
-
-  }
-
-
-
-public Command TankDrive(DoubleSupplier Right, DoubleSupplier Left){
-  return new FunctionalCommand(
-
-
-  // ** INIT
-  ()-> {},
- 
-  // ** EXECUTE
-  ()-> {
+//   // ** EXECUTE
+//   ()-> {
 
     
-      rightMotorLeader.set(Right.getAsDouble());
+//       rightMotorLeader.set(Right.getAsDouble());
       
-      leftMotorLeader.set(Left.getAsDouble());
+//       leftMotorLeader.set(Left.getAsDouble());
 
 
 
-  },
+//   },
  
-  // ** ON INTERRUPTED
-  interrupted -> {},
+//   // ** ON INTERRUPTED
+//   interrupted -> {},
  
-  // ** END CONDITION
-  ()-> false,
+//   // ** END CONDITION
+//   ()-> false,
 
 
-  // ** REQUIREMENTS
-  this);
+//   // ** REQUIREMENTS
+//   this);
 
-  }
+//   }
 
 
 
@@ -287,7 +254,7 @@ public Command motorTurn(DoubleSupplier num) {
 
 //       // EXECUTE
 //       () -> { 
-//         if (controller.getRightY() != 0) {
+//     if (controller.getRightY() != 0) {
 //           servo.set((controller.getRightY()+1)/2);
 //           if(controller.getRightY()>0){
 //             int LEDSpeedParameterG = 0;

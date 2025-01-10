@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.pidcontrol;
 
 import java.util.function.DoubleSupplier;
 
@@ -31,18 +32,19 @@ import edu.wpi.first.wpilibj2.command.Commands.*;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final pidcontrol pidcontroller = new pidcontrol();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
  // private final CommandXboxController m_driverController =
       //new CommandXboxController(0);
   private final CommandXboxController m_driverController =
-      new CommandXboxController(1);
+      new CommandXboxController(0);
   private final Joystick m_leftJoystick =
       new Joystick(0);
   
 
 
-  private final DoubleSupplier leftYAxis = () -> m_leftJoystick.getRawAxis(1);
+  //private final DoubleSupplier leftYAxis = () -> m_leftJoystick.getRawAxis(1);
   private final DoubleSupplier rightYAxis = () -> m_driverController.getRawAxis(1);
   
 
@@ -84,7 +86,8 @@ public class RobotContainer {
        // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.servoTurn());
        // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.motorTurn(leftYAxis));
        // m_exampleSubsystem.setDefaultCommand(m_exampleSubsystem.TankDrive(rightYAxis,leftYAxis));
-        m_driverController.b().onTrue( m_exampleSubsystem.PID());
+      // pidcontroller.setDefaultCommand(pidcontroller.pidcontrolCommand());
+       m_driverController.b().whileTrue(pidcontroller.pidcontrolCommand());
        // .onTrue(runOnce(() -> m_exampleSubsystem.PID(), m_exampleSubsystem));
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
@@ -104,3 +107,7 @@ public class RobotContainer {
     return Autos.exampleAuto(m_exampleSubsystem);
   }
 }
+
+// git add .
+// git commit -m '__'
+// git push 
